@@ -1,0 +1,998 @@
+{% extends "layouts/base.html" %} {% block title %} Search {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+<link rel="stylesheet" href="static/assets/css/circle.css">
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-profile">
+            <div class="card-body">
+
+                <h4 class="card-title">Target specific IP</h4>
+                <div class="row">
+
+                    <div class="col-md-3 px-md-1">
+                        <div class="form-group">
+
+                            <form class="form-group" action="/search" method="post">
+                                <div>
+                                    <table class="table" id="">
+                                        <thead class=" text-primary">
+                                            <tr>
+                                                <td>
+                                                    <input class="form-control" type="text" name="search" value="127.0.0.1" />
+                                                </td>
+                                                <td>
+                                                    <input class="btn btn-primary btn-round" type="submit" value="submit" />
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card card-profile">
+                <div class="card-body">
+                    <table>
+                        <tr>
+                            <td>
+                                <h2 class="card-title"><strong> {{ip}}</strong></h2>
+
+                            </td>
+                            <td>
+                                {% if allData.keys()|length >0 %}
+                                <!--to add -->
+                                <img src="https://flagicons.lipis.dev/flags/1x1/{{allData['cn']['country']}}.svg" class="avatar" /> {%endif%}
+                            </td>
+                            <td>
+                                <div class="card-body" id="vpnalert">
+                                </div>
+
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="card-body" id="vpnprotoalert">
+                        <div class="alert alert-success">
+                            <span><b> System does not support a VPN protocol: </b> The ip has not been configured to be used as a vpn.</span>
+                        </div>
+
+                    </div>
+                    {%if riskData.keys() | length >0%}
+                    <table class="table " id="">
+                        <thead class=" text-primary">
+                            <tr>
+                                <th>
+                                    Parameter
+                                </th>
+                                <th>
+                                    Value
+                                </th>
+                                <th>
+                                    Additional Info
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    ASN
+                                </td>
+                                <td>
+                                    {{allData["asn"]["id"]}}
+                                </td>
+                                <td>
+                                    {{allData["asn"]["name"]}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Blacklisted
+                                </td>
+                                <td>
+                                    {{riskData['blacklisted']}}
+                                </td>
+                                <td>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    DataCentre
+                                </td>
+                                <td>
+                                    {{riskData['dataCenter']}}
+                                </td>
+                                <td>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Bad asn
+                                </td>
+                                <td>
+                                    {{riskData['badAsn']}}
+                                </td>
+                                <td>
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    {%endif%} {% if details.keys() | length >0%}
+                    <div>
+                        <div>
+                            <h4>IP Details:</h4><b></b>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>ISP</label>
+                                        <input type="text" class="form-control" placeholder="Home Address" style="background-color:skyblue;" value="{{details['isp']}}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>latitude and longitude</label>
+                                        <input type="text" class="form-control" style="background-color:skyblue;" placeholder="lat and long" value="{{details['lat_long']}}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Region or city</label>
+                                        <input type="text" class="form-control" style="background-color:skyblue;" placeholder="City" value="{{details['region']}}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Country</label>
+                                        <input type="text" class="form-control" style="background-color:skyblue;" placeholder="Country" value="{{details['country']}}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Postal Code</label>
+                                        <input type="text" class="form-control" style="background-color:skyblue;" placeholder="ZIP Code" value="{{details['zipcode']}}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card card-profile">
+                <div class="card-body">
+
+                    <h4 class="card-title">Map</h4>
+                    <div id="chartdiv"></div>
+
+
+                    <!-- sample -->
+                    <style>
+                        #chartdiv {
+                            width: 100%;
+                            height: 490px;
+                        }
+                    </style>
+                    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+                    <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+                    <script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
+                    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+                    <script>
+                        am5.ready(function() {
+
+                            var root = am5.Root.new("chartdiv");
+
+
+                            root.setThemes([
+                                am5themes_Animated.new(root)
+                            ]);
+
+
+                            var chart = root.container.children.push(am5map.MapChart.new(root, {
+                                panX: "translateX",
+                                panY: "translateY",
+                                projection: am5map.geoMercator()
+                            }));
+
+                            var cont = chart.children.push(am5.Container.new(root, {
+                                layout: root.horizontalLayout,
+                                x: 20,
+                                y: 40
+                            }));
+
+
+
+                            cont.children.push(am5.Label.new(root, {
+                                centerY: am5.p50,
+                                text: "Map"
+                            }));
+
+                            var switchButton = cont.children.push(am5.Button.new(root, {
+                                themeTags: ["switch"],
+                                centerY: am5.p50,
+                                icon: am5.Circle.new(root, {
+                                    themeTags: ["icon"]
+                                })
+                            }));
+
+                            switchButton.on("active", function() {
+                                if (!switchButton.get("active")) {
+                                    chart.set("projection", am5map.geoMercator());
+                                    chart.set("panX", "translateX");
+                                    chart.set("panY", "translateY");
+                                } else {
+                                    chart.set("projection", am5map.geoOrthographic());
+                                    chart.set("panX", "rotateX");
+                                    chart.set("panY", "rotateY");
+                                }
+                            });
+
+                            cont.children.push(am5.Label.new(root, {
+                                centerY: am5.p50,
+                                text: "Globe"
+                            }));
+
+                            var polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+                                geoJSON: am5geodata_worldLow
+                            }));
+
+                            var graticuleSeries = chart.series.push(am5map.GraticuleSeries.new(root, {}));
+                            graticuleSeries.mapLines.template.setAll({
+                                stroke: root.interfaceColors.get("alternativeBackground"),
+                                strokeOpacity: 0.08
+                            });
+
+
+                            var lineSeries = chart.series.push(am5map.MapLineSeries.new(root, {}));
+                            lineSeries.mapLines.template.setAll({
+                                stroke: root.interfaceColors.get("alternativeBackground"),
+                                strokeOpacity: 0.6
+                            });
+
+
+                            var citySeries = chart.series.push(
+                                am5map.MapPointSeries.new(root, {})
+                            );
+
+                            citySeries.bullets.push(function() {
+                                var circle = am5.Circle.new(root, {
+                                    radius: 5,
+                                    tooltipText: "{title}",
+                                    tooltipY: 0,
+                                    fill: am5.color(0xffba00),
+                                    stroke: root.interfaceColors.get("background"),
+                                    strokeWidth: 2
+                                });
+
+                                return am5.Bullet.new(root, {
+                                    sprite: circle
+                                });
+                            });
+
+
+                            var arrowSeries = chart.series.push(
+                                am5map.MapPointSeries.new(root, {})
+                            );
+
+                            arrowSeries.bullets.push(function() {
+                                var arrow = am5.Graphics.new(root, {
+                                    fill: am5.color(0x000000),
+                                    stroke: am5.color(0x000000),
+                                    draw: function(display) {
+                                        display.moveTo(0, -3);
+                                        display.lineTo(8, 0);
+                                        display.lineTo(0, 3);
+                                        display.lineTo(0, -3);
+                                    }
+                                });
+
+                                return am5.Bullet.new(root, {
+                                    sprite: arrow
+                                });
+                            });
+
+
+                            // let myDictionary = {
+                            //             id: "",
+                            //             title: "",
+                            //             geometry: {
+                            //                 type: "",
+                            //                 coordinates: []
+                            //             },
+                            //             isVPN: ""
+                            //         };
+                            var cities = [];
+
+                            function addvalues(dump, cities) {
+
+                                for (let i = 0; i < dump.length; i++) {
+                                    let myDictionary = {
+                                        id: "",
+                                        title: "",
+                                        geometry: {
+                                            type: "",
+                                            coordinates: []
+                                        },
+                                        isVPN: ""
+                                    };
+
+                                    myDictionary.id = dump[i][1];
+                                    myDictionary.title = dump[i][2];
+                                    myDictionary.geometry["type"] = "Point";
+                                    myDictionary.geometry["coordinates"] = dump[i][4];
+                                    if (dump[i][0] == 'True') {
+                                        myDictionary.isVPN = true;
+                                    } else {
+                                        myDictionary.isVPN = false;
+                                    }
+                                    cities.push(myDictionary);
+
+                                }
+                                return cities;
+                            }
+                            try {
+                                var allData = JSON.parse('{{allDataIP | tojson}}');
+                                //console.log("here", allData);
+                                var tobeadded = [];
+                                for (let i = 0; i < Object.keys(allData.keyList).length; i++) {
+                                    let cond1 = allData[allData.keyList[i]][0].isVpnASN || allData[allData.keyList[i]][0].isVpnASN === 'True';
+                                    let cond2 = allData[allData.keyList[i]][0].isVPNTime || allData[allData.keyList[i]][0].isVPNTime === 'True';
+                                    tobeadded.push([cond1 || cond2, allData[allData.keyList[i]][0].countryCode, allData[allData.keyList[i]][0].country, "Point", [allData[allData.keyList[i]][0].lon, allData[allData.keyList[i]][0].lat]])
+                                    console.log("hhh", tobeadded);
+                                }
+
+                                addvalues(tobeadded, cities);
+                                //console.log("aaa", cities)
+                            } catch (e) {
+                                console.log(e);
+                            }
+                            try {
+                                var allData = JSON.parse('{{details | tojson}}');
+                                console.log("her1e", allData);
+                                var tobeadded = [];
+                                let cond1 = allData.isVPN || allData.isVPN === 'True';
+
+                                let lat = allData.lat_long.split(" & ");
+
+                                tobeadded.push([cond1, allData.region, allData.country, "Point", [lat[1], lat[0]]]);
+                                console.log("hhh", tobeadded);
+                                addvalues(tobeadded, cities);
+                                //console.log("aaa", cities)
+                            } catch (e) {
+                                console.log(e);
+                            }
+
+                            /*dump1 = [
+                                [true, "india", "india", "point", [80, 40]], //VPN, ID, TITLE, Point, Coordinates{Lat, Long}
+                                [false, "indo", "indo", "point", [40, 80]]
+                            ];
+                            addvalues(dump1, cities);*/
+                            //console.log(cities);
+
+                            //call function;
+                            // var cities1 = [{
+                            //     id: "london",
+                            //     title: "London",
+                            //     geometry: {
+                            //         type: "Point",
+                            //         coordinates: [-0.1262, 51.5002]
+                            //     },
+                            //     isVPN: true
+                            // }, {
+                            //     id: "india",
+                            //     title: "india",
+                            //     geometry: {
+                            //         type: "Point",
+                            //         coordinates: [32, 51]
+                            //     },
+                            //     isVPN: false
+                            // }, {
+                            //     id: "chine",
+                            //     title: "chine",
+                            //     geometry: {
+                            //         type: "Point",
+                            //         coordinates: [52, 61]
+                            //     },
+                            //     isVPN: false
+                            // }, {
+                            //     id: "chinasde",
+                            //     title: "chinasde",
+                            //     geometry: {
+                            //         type: "Point",
+                            //         coordinates: [62, 81]
+                            //     },
+                            //     isVPN: false
+                            // }, {
+                            //     id: "us",
+                            //     title: "us",
+                            //     geometry: {
+                            //         type: "Point",
+                            //         coordinates: [80, 40]
+                            //     },
+                            //     isVPN: true
+                            // }]
+                            // console.log(cities1);
+                            citySeries.data.setAll(cities);
+                            console.log(citySeries);
+
+
+
+                            //console.log(cities);
+                            var destinations = [];
+
+                            for (const x in cities) {
+                                var myObj = cities[x];
+                                if (myObj.isVPN == true) {
+                                    destinations.push(myObj.id);
+                                };
+                            }
+                            //console.log(destinations);
+
+                            var originLongitude = -0.1262;
+                            var originLatitude = 51.5002;
+
+                            var destinationDataItem;
+                            var lineDataItem;
+
+                            for (const x in cities) {
+                                var myObj = cities[x];
+                                if (myObj.isVPN == false) {
+                                    originLongitude = myObj.geometry.coordinates[0];
+                                    originLatitude = myObj.geometry.coordinates[1];
+
+
+                                    am5.array.each(destinations, function(did) {
+                                        destinationDataItem = citySeries.getDataItemById(did);
+                                        console.log(destinationDataItem);
+                                        lineDataItem = lineSeries.pushDataItem({
+                                            geometry: {
+                                                type: "LineString",
+                                                coordinates: [
+                                                    [originLongitude, originLatitude],
+                                                    [destinationDataItem.get("longitude"), destinationDataItem.get("latitude")]
+                                                ]
+                                            }
+                                        });
+
+                                        arrowSeries.pushDataItem({
+                                            lineDataItem: lineDataItem,
+                                            positionOnLine: 0.5,
+                                            autoRotate: true
+                                        });
+                                    })
+                                };
+                            }
+
+
+
+
+
+                            polygonSeries.events.on("datavalidated", function() {
+                                chart.zoomToGeoPoint({
+                                    longitude: -0.1262,
+                                    latitude: 51.5002
+                                }, 3);
+                            })
+
+
+
+                            chart.appear(1000, 1000);
+                        });
+                    </script>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-profile">
+            <div class="card-body">
+                <h6 class="card-category text-gray"></h6>
+                <h4 class="card-title">
+                    <script>
+                        var pptp_status = 0;
+                        var l2tp_ipsec_status = 0;
+                        var openvpn_status = 0;
+                        var sstp_status = 0;
+                        var ike_status = 0;
+                        var ike_ip = '219.100.37.7';
+                        search_ip = '{{ip}}';
+                        async function pptp() {
+                            var xmlhttp = new XMLHttpRequest();
+                            var url = "/vpn/pptp?ip=" + search_ip;
+                            const response = await fetch(url);
+                            var message = await response.text();
+                            console.log("#########", message);
+                            if (JSON.parse(message)['oports']['1723']['state'] == 'open') {
+                                pptp_status = 1;
+
+                            }
+
+                            if (pptp_status == 1) {
+                                document.getElementById('pptp_stat').innerHTML = '<h4 style="color: green">PPTP is accessible.<h4>';
+                            } else {
+                                document.getElementById('pptp_stat').innerHTML = '<h4 style="color: red">PPTP is not accessible.<h4>';
+                            }
+                            if (pptp_status == 1) {
+                                var notVpn = "System supports a VPN protocol";
+                                document.getElementById("vpnprotoalert").innerHTML = `<div class="alert alert-warning ">
+                                <span><b> ` + notVpn + ` - </b> The ip has been configured to be used as a vpn.</span>
+                            </div>`;
+                            }
+                            document.getElementById('pptp').innerHTML += message + '<br />';
+
+
+                        };
+                        pptp();
+                        async function l2tp_ipsec() {
+                            var xmlhttp = new XMLHttpRequest();
+                            var url = "/vpn/l2tp_ipsec?ip=" + search_ip;
+                            const response = await fetch(url);
+                            var message = await response.text();
+                            if (JSON.parse(message)['oports']['500']['state'] == 'open') {
+                                l2tp_ipsec_status = 1;
+
+                            }
+                            if (l2tp_ipsec_status == 1) {
+                                document.getElementById('l2tp_stat').innerHTML = '<h4 style="color: green">L2TP/IPSEC or IPSEC is accessible.<h4>';
+                            } else {
+                                document.getElementById('l2tp_stat').innerHTML = '<h4 style="color: red">L2TP/IPSEC or IPSEC is not accessible.<h4>';
+                            }
+                            console.log("#########", message);
+                            document.getElementById('l2tp_ipsec').innerHTML += message + '<br />';
+                            if (l2tp_ipsec_status == 1) {
+                                var notVpn = "System supports a VPN protocol";
+                                document.getElementById("vpnprotoalert").innerHTML = `<div class="alert alert-danger ">
+                                <span><b> ` + notVpn + ` - </b> The ip has been configured to be used as a vpn.</span>
+                            </div>`;
+                            }
+                        };
+                        l2tp_ipsec();
+                        async function openvpn() {
+                            var xmlhttp = new XMLHttpRequest();
+                            var url = "/vpn/openvpn?ip=" + search_ip;
+                            const response = await fetch(url);
+                            var message = await response.text();
+                            if (JSON.parse(message)['oports']['1194']['state'] == 'open') {
+                                openvpn_status = 1;
+                            }
+                            if (openvpn_status == 1) {
+                                document.getElementById('openvpn_stat').innerHTML = '<h4 style="color: green">openvpn is accessible.<h4>';
+                            } else {
+                                document.getElementById('openvpn_stat').innerHTML = '<h4 style="color: red">openvpnis not accessible.<h4>';
+                            }
+                            console.log("#########", message);
+                            document.getElementById('openvpn').innerHTML += message + '<br />';
+                            if (openvpn_status == 1) {
+                                var notVpn = "System supports a VPN protocol";
+                                document.getElementById("vpnprotoalert").innerHTML = `<div class="alert alert-danger ">
+                                <span><b> ` + notVpn + ` - </b> The ip has been configured to be used as a vpn.</span>
+                            </div>`;
+                            }
+                        };
+                        openvpn();
+                        async function sstp() {
+                            var xmlhttp = new XMLHttpRequest();
+                            var url = "/vpn/sstp?ip=" + search_ip;
+                            const response = await fetch(url);
+                            // console.log(await response.text())
+                            var message = await response.text();
+                            if (JSON.parse(message)['sstp'] != false) {
+                                sstp_status = 1;
+                            }
+                            if (sstp_status == 1) {
+                                document.getElementById('sstp_stat').innerHTML = '<h4 style="color: green">SSTP is accessible.<h4>';
+                            } else {
+                                document.getElementById('sstp_stat').innerHTML = '<h4 style="color: red">SSTP not accessible.<h4>';
+                            }
+                            console.log("#########", message);
+                            document.getElementById('sstp').innerHTML += message + '<br />';
+
+                            if (sstp_status == 1) {
+                                var notVpn = "System supports a VPN protocol";
+                                document.getElementById("vpnprotoalert").innerHTML = `<div class="alert alert-danger ">
+                                <span><b> ` + notVpn + ` - </b> The ip has been configured to be used as a vpn.</span>
+                            </div>`;
+                            }
+                        };
+                        sstp();
+                        // async function ike() {
+                        //     var xmlhttp = new XMLHttpRequest();
+                        //     var url = "/vpn/ike?ip=" + search_ip;
+                        //     const response = await fetch(url);
+                        //     console.log(await response.text())
+                        // };
+                        // ike();
+                        async function ike() {
+                            var old = console.log;
+                            // var logger = document.getElementById('ike');
+                            var xmlhttp = new XMLHttpRequest();
+                            var url = "/vpn/ike?ip=" + search_ip;
+                            const response = await fetch(url);
+                            // console.log(await response.text())
+                            var message = await response.text();
+
+                            console.log("#########", message);
+                            const myArray = message.split('\\n');
+                            var printer = ""
+
+                            for (let i = 0; i < myArray.length; i++) {
+                                printer += myArray[i] + '<br />';
+                            }
+                            if (JSON.parse(message)['ike'].length > 250) {
+                                ike_status = 1;
+                            }
+                            if (ike_status == 1) {
+                                document.getElementById('ike_stat').innerHTML = '<h4 style="color: green">IKE is accessible.<h4>';
+                            } else {
+                                document.getElementById('ike_stat').innerHTML = '<h4 style="color: red">IKE not accessible.<h4>';
+                            }
+                            console.log("####ike", ike_status);
+                            document.getElementById('ike').innerHTML += printer + '<br />';
+                            if (ike_status == 1) {
+                                var notVpn = "System supports a VPN protocol";
+                                document.getElementById("vpnprotoalert").innerHTML = `<div class="alert alert-danger ">
+                                <span><b> ` + notVpn + ` - </b> The ip has been configured to be used as a vpn.</span>
+                            </div>`;
+                            }
+
+
+                        }
+                        ike();
+                    </script>
+                </h4>
+                <h3>All protocols available</h3>
+                <div>
+
+                    <h3>pptp</h3>
+                    <div id='pptp_stat'></div>
+                    <div class="card card-profile" style="background-color: #1d1d29;">
+
+                        <div class="card-body">
+                            <p id='pptp'></p>
+                        </div>
+
+                    </div>
+                    <h3>sstp</h3>
+                    <div id='sstp_stat'></div>
+                    <div class="card card-profile" style="background-color: #1d1d29;">
+
+                        <div class="card-body">
+                            <p id='sstp'></p>
+                        </div>
+
+                    </div>
+                    <h3>ike</h3>
+                    <div id='ike_stat'></div>
+                    <div class="card card-profile" style="background-color: #1d1d29;">
+
+                        <div class="card-body">
+                            <p id='ike'></p>
+                        </div>
+
+                    </div>
+                    <h3>openvpn</h3>
+                    <div id='openvpn_stat'></div>
+                    <div class="card card-profile" style="background-color: #1d1d29;">
+
+                        <div class="card-body">
+                            <p id='openvpn'></p>
+                        </div>
+
+                    </div>
+                    <h3>l2tp/ipsec</h3>
+                    <div id='l2tp_stat'></div>
+                    <div class="card card-profile" style="background-color: #1d1d29;">
+
+                        <div class="card-body">
+                            <p id='l2tp_ipsec'></p>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-profile">
+            <div class="card-body">
+                <h6 class="card-category text-gray"></h6>
+                <h4 class="card-title">
+                    <div class="p-0">
+                        <h2>Targeted Attacks</h2>
+
+                        <h2>Attacking</h2>
+                        <div class="d-flex px-2 py-1">
+                            <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm"></h6>
+                                <p class="text-xs text-secondary mb-0"></p>
+                                <h5><a href="/attack" id="attackIp">This IP has not been attacked</a></h5>
+                            </div>
+                        </div>
+                        <h2>Tracking</h2>
+                        <div class="d-flex px-2 py-1">
+                            <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm"></h6>
+                                <p class="text-xs text-secondary mb-0"></p>
+                                <h5><a href="/attack" id="trackIp">This IP has not been tracked</a></h5>
+                            </div>
+                        </div>
+
+                        <!-- nmap button -->
+
+                </h4>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="title">Data for this IP</h5>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <table class="table tablesorter " id="">
+                            <thead class=" text-primary">
+                                <tr id="relatedheads">
+                                </tr>
+                            </thead>
+                            <tbody id="relatedbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+
+                </div>
+            </div>
+        </div>
+        <!-- <script>
+        var riskp, colour;
+        var country;
+        function calcrisk(){
+            for(let i = 0; i < length; i++){
+                if(country) //black country list
+                {    riskp = '100%'
+                    document.getElementsById('riskbar').className = "c100 p100 red";
+                }
+            }
+            for(let i = 0; i < length; i++){
+                if(country) // grey country
+                {
+                    riskp = '50%'
+                    document.getElementsById('riskbar').className = "c100 p50 green dark";
+                }
+            }
+            for(let i = 0; i < length; i++){
+                if(country) //bad ASN
+                {    riskp = '80%'
+                     document.getElementsById('riskbar').className = "c100 p80 orange dark";
+                }
+            }
+            for(let i = 0; i < length; i++){
+                if(country) // black listed
+                {
+                    riskp = '100%'
+                    document.getElementsById('riskbar').className = "c100 p100 red";
+                }
+            }
+        }
+    </script> -->
+
+        <div class="col-md-4">
+            <div class="card card-user">
+                <div class="card-body">
+                    <table class="table " id="">
+                        <h2 class="title center">
+                            Risk rating
+                        </h2>
+                        <a href=" javascript:void(0) ">
+                            <div class="block block-one"></div>
+                            <div class="block block-two"></div>
+                            <div class="block block-three"></div>
+                            <div class="block block-four"></div>
+
+                            <td>
+                                <div id='riskbar' class="c100 p{{riskData['per']}} {{details['ratingcolor']}} dark">
+                                    {% if riskData %}
+                                    <span><b>{{riskData["per"]}}%</b></span>
+                                    <div class="slice">
+                                        <div class="bar"></div>
+                                        <div class="fill"></div>
+                                    </div>
+                                    {% else %}
+                                    <span><b>0%</b></span>
+                                    <div class="slice">
+                                        <div class="bar "></div>
+                                        <div class="fill "></div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                            </td>
+                            <td>
+                                Is VPN by Timezone<br><br> Blacklisted Country<br><br>Grey Country<br><br>From Data Center<br><br>Bad ASN <br><br> Blacklisted ASN
+                            </td>
+                            <td>{{riskData["Timezone"]}}
+                                <br><br>{{riskData["black"]}}<br><br>{{riskData["grey"]}}<br><br>{{riskData["dataCenterVal"]}}<br><br>{{riskData["badAsnVal"]}} <br><br>{{riskData["blacklistedVal"]}}
+
+                            </td>
+
+                            </td>
+                            </tr>
+
+                            </tbody>
+                    </table>
+                    <div>
+                        <p class="card-text">
+                            <div class="author">
+                                <div class="block block-one"></div>
+                                <div class="block block-two"></div>
+                                <div class="block block-three"></div>
+                                <div class="block block-four"></div>
+                            </div>
+                        </p>
+                        <div class="card-description ">
+                            The scores above are added to form risk factor, the max value is 100
+                        </div>
+                    </div>
+                    <div class="card-footer ">
+                        hello
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-profile">
+                <div class="card-body">
+
+                    <h4 class="card-title">Matches</h4>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table tablesorter " id="">
+                                <thead class=" text-primary">
+                                    <tr id="resultheads">
+                                    </tr>
+                                </thead>
+                                <tbody id="resultbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{%if result | length >1%} {% for key, value in result.items() %} {{key}} {{value}} <br> {% endfor %} {% endif %}
+<script>
+    document.write(`
+        {{result}}
+        `)
+</script>
+
+{% endblock content %} {% block javascripts %}
+<script>
+    /* This is for Result display*/
+    var results = JSON.parse('{{allDataIP | tojson}}');
+    var resultHead = document.getElementById("resultheads")
+    var resultBody = document.getElementById("resultbody");
+    var one = "<th>IP</th>";
+    var two = "";
+    for (let i = 0; i < Object.keys(results['cols']).length; i++) {
+        one += "<th>" + results['cols'][i] + "</th>";
+    }
+    one += "<th>Further Analysis</th>";
+    for (let i = 0; i < Object.keys(results['keyList']).length; i++) {
+        two += "<tr><td>" + results['keyList'][i] + "</td>";
+        for (let j = 0; j < Object.keys(results['cols']).length; j++) {
+            two += "<td>" + results[results['keyList'][i]][0][results['cols'][j]] + "</td>";
+        }
+        two += "<td><a href = '/ipDetail/" + results['keyList'][i] + "'>Here</a></td></tr>"
+    }
+    resultHead.innerHTML = one;
+    resultBody.innerHTML = two;
+</script>
+
+<script>
+    /* This is for all data with this IPs display if this is an array when testing then put array keys in keylist and do as above*/
+    var related1 = JSON.parse('{{trackIp | tojson}}');
+    console.log(related1)
+    var attackIp = document.getElementById("attackIp");
+    var trackIp = document.getElementById("trackIp");
+    if (Object.keys(related1['attack']).length != 0) {
+        attackIp.innerHTML = "<table class='table align-items-center mb-0'><thead><tr><td class='text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>JS Of Attack</td><td class='text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Time Of Attack</td></tr></thead><tbody><td>" + related1['attack'][0]['js'] + "</td><td>" + related1['attack'][0]['timestamp'] + "</td></tbody></table>"
+    }
+    if (Object.keys(related1['track']).length != 0) {
+        var one = "";
+        for (let i = 0; i < Object.keys(related1['track']).length; i++) {
+            one += "<td>" + related1['track'][i]['id'] + "</td><td>" + related1['track'][i]['timestamp'] + "</td>"
+        }
+        trackIp.innerHTML = "<table class='table align-items-center mb-0'><thead><tr><td class='text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>IDs of Attacking Image</td><td class='text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Tracking Logs</td></tr></thead><tbody>" + one + "</tbody></table>";
+    }
+
+    var related = JSON.parse('{{dataWithThisIp | tojson}}');
+    console.log("Here", related)
+    var relatedHead = document.getElementById("relatedheads")
+    var relatedBody = document.getElementById("relatedbody");
+    var one = "";
+    var two = "<tr>";
+    for (let i = 0; i < Object.keys(related['cols']).length; i++) {
+        one += "<th>" + related['cols'][i] + "</th>";
+    }
+    one += "<th>Further Analysis</th>";
+    for (let i = 0; i < Object.keys(related['data']).length; i++) {
+        for (let j = 0; j < Object.keys(related['cols']).length; j++) {
+            two += "<td>" + related['data'][i][related['cols'][j]] + "</td>";
+        }
+        two += "<td><a href = '/cookieDetail/" + related['data'][i]['cookie'] + "'>Here</a></td></tr>"
+    }
+    relatedHead.innerHTML = one;
+    relatedBody.innerHTML = two;
+    //console.log("here", related)
+</script>
+
+
+<script type="text/javascript ">
+    function notif() {
+        console.log("");
+        //console.log("$$$$", "{{details}}");
+        var data = JSON.parse('{{riskData | tojson}}');
+        if (Object.keys(data).length > 0) {
+            if (data["per"] < 30) {
+                var notVpn = "This is not a VPN ip ";
+                document.getElementById("vpnalert").innerHTML = `<div class="alert alert-success ">
+                                <span><b> ` + notVpn + ` - </b> The ip is not masking itself.</span>
+                            </div>`;
+            } else {
+                var isVPN = "This is a VPN ip ";
+                document.getElementById("vpnalert").innerHTML = `<div class="alert alert-danger ">
+                                <span><b> ` + isVPN + ` </b> The ip seems to be masking itself.</span>
+                            </div>`;
+            }
+        }
+    }
+
+    notif();
+</script>
+
+{% endblock javascripts %}

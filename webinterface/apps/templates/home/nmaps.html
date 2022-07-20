@@ -1,0 +1,95 @@
+{% extends "layouts/base.html" %} {% block title %} Page Blank {% endblock %} {% block stylesheets %}
+<style>
+    .hidden {
+        visibility: hidden;
+    }
+</style>
+{% endblock stylesheets %} {% block javascripts %} {%endblock javascripts%} {% block content %}
+<div style="padding-top: 70px;">
+    <div>
+        <script>
+            function on_submit() {
+
+                var input = document.getElementById("fname");
+                var speed;
+                if (document.getElementById('Button1').checked) {
+                    speed = 'top10';
+                }
+                if (document.getElementById('Button2').checked) {
+                    speed = 'top50';
+                }
+                if (document.getElementById('Button3').checked) {
+                    speed = 'top100';
+                }
+                var inputData = encodeURIComponent(input.value);
+
+                var xhr = new XMLHttpRequest();
+                var params = "ip=" + input + "&speed=" + speed;
+                xhr.open('POST', '/api/portscan', true);
+
+                //Send the proper header information along with the request
+                xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+                xhr.onload = function() { //Call a function when the state changes.
+                    if (xhr.status == 200) {
+                        alert(this.responseText);
+                        document.getElementById("result").innerHTML = xhttp.responseText;
+                    }
+                }
+                xhr.send(params);
+            }
+        </script>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-profile">
+                    <div class="card-body">
+                        <h6 class="card-category text-gray"></h6>
+                        <h4 class="card-title">
+                            <form action="/api/portscan" class='form-group'>
+                                <label for="fname"><h4>Enter IP</h4></label>
+                                <input type="text" id="ip" name="ip" class='form-control'>
+                                <input type="radio" id="Button1" name="speed" value="top10">
+                                <label for="Button1"><h5>Top 10 ports</h5></label><br>
+                                <input type="radio" id="Button2" name="speed" value="top50">
+                                <label for="Button2"><h5>Top 50 ports</h5></label><br>
+                                <input type="radio" id="Button3" name="speed" value="top100">
+                                <label for="Button3"><h5>Top 100 ports</h5></label><br>
+
+                                <button value="Submit" class="btn btn-primary btn-round">Submit</button>
+                            </form>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-profile">
+            <div class="card-body">
+                <h6 class="card-category text-gray"></h6>
+                <h4 class="card-title">
+                    <div>
+                        <h4>Output</h4>
+                        <p>The results would appear here</p>
+                        <div id='result'>
+                            <h2>{{hostname}} ( {{hoststate}} )</div>
+                        </h2>
+                        <h2></h2>
+                        {% for key, value in oports.items() %}
+                        <h4>Port: {{key}} ( state: {{value}} )</h4>
+                        {% endfor %}
+                    </div>
+                </h4>
+
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock content %}
